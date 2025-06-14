@@ -1,0 +1,81 @@
+const mongoose = require("mongoose");
+
+const productSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      minLength: [3, "too short product title"],
+      maxLength: [1000, "too long product title"],
+      trim: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      lowercase: true,
+    },
+    description: {
+      type: String,
+      required: true,
+      minLength: [20, "too short product description"],
+    },
+    quantity: {
+      type: Number,
+      required: [true, "quantity is required"],
+    },
+    sold: {
+      type: Number,
+      default: 0,
+    },
+    price: {
+      type: Number,
+      required: [true, "product price is required"],
+      max: [20000, "too long price"],
+    },
+    priceAfterDiscount: {
+      type: Number,
+    },
+    colors: {
+      type: [String],
+    },
+    imageCover: {
+      type: String,
+      required: [true, "image is required"],
+    },
+    images: {
+      type: [String],
+    },
+    category: {
+      type: mongoose.Schema.ObjectId,
+      required: [true, "category is required"],
+      ref: "category",
+    },
+    subcategory: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "subCategory",
+      },
+    ],
+    brand: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Brands",
+    },
+    rateingAverage: {
+      type: Number,
+      min: [1, "rateing must be above or equal to 1"],
+      max: [5, "rateing must be below or equal to 5"],
+    },
+    ratingQuantity: {
+      type: Number,
+      default: 0,
+    },
+  },
+  { timestamps: true }
+);
+
+productSchema.pre(/^find/, function(next) {
+  this.populate({ path: "category", select: "name" });
+  next();
+});
+
+module.exports = mongoose.model("product", productSchema);
