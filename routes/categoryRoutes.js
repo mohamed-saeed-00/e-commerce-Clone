@@ -14,6 +14,7 @@ const {
   updateCategory,
   deleteCategory,
   uploadCategoryImage,
+  resizeImage,
 } = require("../services/categoryServcies");
 
 const subCategoryRoutes = require("./subCategoryRoutes");
@@ -21,7 +22,10 @@ const subCategoryRoutes = require("./subCategoryRoutes");
 // nested route
 router.use("/:categoryId/subcategories", subCategoryRoutes);
 
-router.route("/").get(getCategories).post(uploadCategoryImage,createCategoryRules, createCategory);
+router
+  .route("/")
+  .get(getCategories)
+  .post(uploadCategoryImage, resizeImage, createCategoryRules, createCategory);
 
 router
   .route("/:id")
