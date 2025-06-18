@@ -13,13 +13,27 @@ const categorySchema = new mongoose.Schema(
       type: String,
       lowercase: true,
     },
-    image:{
-        type:String
-    }
+    image: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
 
-const categoryModel = mongoose.model('category',categorySchema);
+const setImageUrl = (doc) => {
+  if (doc) {
+    const imageUrl = `${process.env.BASE_URL}/categories/${doc.image}`;
+    doc.image = imageUrl;
+  }
+};
 
-module.exports = categoryModel
+categorySchema.post("init", (doc) => {
+  setImageUrl(doc);
+});
+
+categorySchema.post("save", (doc) => {
+  setImageUrl(doc);
+});
+const categoryModel = mongoose.model("category", categorySchema);
+
+module.exports = categoryModel;

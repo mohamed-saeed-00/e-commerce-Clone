@@ -30,7 +30,7 @@ router
 router
   .route("/:id")
   .get(getCategoryRules, getCategory)
-  .put(updateCategoryRules, updateCategory)
+  .put(uploadCategoryImage, resizeImage,updateCategoryRules, updateCategory)
   .delete(deleteCategoryRules, deleteCategory);
 
 module.exports = router;

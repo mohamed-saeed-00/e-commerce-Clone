@@ -1,4 +1,6 @@
 require("dotenv").config({ path: "config.env" });
+
+const path = require("path")
 const express = require("express");
 const morgan = require("morgan");
 
@@ -19,6 +21,7 @@ const brandRouter = require('./routes/brandsRoute')
 const productRouter = require('./routes/productRoutes')
 // mounting api
 app.use(express.json());
+app.use(express.static(path.join(__dirname,"uploads")))
 app.use("/api/categories", categoryRoutes);
 app.use("/api/subcategories", subCategoryRoutes);
 app.use("/api/brands", brandRouter);

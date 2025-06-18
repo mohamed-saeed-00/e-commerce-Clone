@@ -1,6 +1,28 @@
+const asyncHandler = require("express-async-handler");
+// eslint-disable-next-line import/no-extraneous-dependencies
+const sharp = require("sharp");
+// eslint-disable-next-line import/no-extraneous-dependencies
+const { v4: uuidv4 } = require("uuid");
 const Brand = require("../models/brandsModal");
 
 const factory = require("./handlerFactor");
+const {
+  uploadSingleImage,
+} = require("../middleware/uploadSingleImageMiddleware");
+exports.uploadBrandImage = uploadSingleImage("image");
+
+exports.resizeImage = asyncHandler(async (req, res, next) => {
+  const fileName = `brand-${uuidv4()}-${Date.now()}-.jpeg`;
+  await sharp(req.file.buffer)
+    .resize(600, 600)
+    .toFormat("jpeg")
+    .jpeg({ quality: 95 })
+    .toFile(`uploads/brands/${fileName}`);
+
+  // save image at database
+  req.body.image = fileName;
+  next();
+});
 
 // @desc create a category
 // @route post
