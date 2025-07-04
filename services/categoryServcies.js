@@ -10,7 +10,7 @@ const factory = require("./handlerFactor");
 
 const {
   uploadSingleImage,
-} = require("../middleware/uploadSingleImageMiddleware");
+} = require("../middleware/uploadImageMiddleware");
 
 const categoryModel = require("../models/categoryModel");
 // const multerStorage = multer.diskStorage({

@@ -11,20 +11,11 @@ const { v4: uuidv4 } = require("uuid");
 const AppError = require("../utils/appError");
 const Product = require("../models/productModal");
 const factory = require("./handlerFactor");
+const {uploadMixImages} =require("../middleware/uploadImageMiddleware")
 
-const multerStorage = multer.memoryStorage();
 
-const multerFilter = function (req, file, cb) {
-  if (file.mimetype.startsWith("image")) {
-    cb(null, true);
-  } else {
-    cb(new AppError("only image upload", 400), false);
-  }
-};
 
-const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
-
-exports.uploadMixImages = upload.fields([
+exports.uploadMixImages = uploadMixImages([
   { name: "imageCover", maxCount: 1 },
   { name: "images", maxCount: 4 },
 ]);

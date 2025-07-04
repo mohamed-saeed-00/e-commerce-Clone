@@ -7,8 +7,9 @@ const Brand = require("../models/brandsModal");
 
 const factory = require("./handlerFactor");
 const {
-  uploadSingleImage,
-} = require("../middleware/uploadSingleImageMiddleware");
+  uploadSingleImage
+} = require("../middleware/uploadImageMiddleware");
+
 exports.uploadBrandImage = uploadSingleImage("image");
 
 exports.resizeImage = asyncHandler(async (req, res, next) => {
