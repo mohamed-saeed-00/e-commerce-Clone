@@ -1,6 +1,6 @@
 require("dotenv").config({ path: "config.env" });
 
-const path = require("path")
+const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 
@@ -16,16 +16,18 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 const categoryRoutes = require("./routes/categoryRoutes");
-const subCategoryRoutes=require('./routes/subCategoryRoutes');
-const brandRouter = require('./routes/brandsRoute')
-const productRouter = require('./routes/productRoutes')
+const subCategoryRoutes = require("./routes/subCategoryRoutes");
+const brandRouter = require("./routes/brandsRoute");
+const productRouter = require("./routes/productRoutes");
+const userRouter = require("./routes/userRoute");
 // mounting api
 app.use(express.json());
-app.use(express.static(path.join(__dirname,"uploads")))
+app.use(express.static(path.join(__dirname, "uploads")));
 app.use("/api/categories", categoryRoutes);
 app.use("/api/subcategories", subCategoryRoutes);
 app.use("/api/brands", brandRouter);
 app.use("/api/products", productRouter);
+app.use("/api/users", userRouter);
 
 app.all("*", (req, res, next) => {
   next(
