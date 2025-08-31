@@ -8,8 +8,9 @@ const {
   getSingleUser,
   updateUser,
   deleteUser,
-  uploadCategoryImage,
+  uploadUserImage,
   resizeImage,
+  updateUserPassword,
 } = require("../services/userServices");
 
 const {
@@ -17,17 +18,19 @@ const {
   createUserValidator,
   updateUserValidator,
   deleteUserValidator,
-} = require("../utils/validators/brandValidator");
+} = require("../utils/validators/userValidator");
+
+router.route("/changePassword/:id").put(updateUserPassword);
 
 router
   .route("/")
-  .post(uploadCategoryImage, resizeImage, createUserValidator, createUser)
+  .post(uploadUserImage, resizeImage, createUserValidator, createUser)
   .get(getAllUsers);
 
 router
   .route("/:id")
-  .get(getSingleUser)
-  .put(uploadCategoryImage, resizeImage, updateUser)
-  .delete(deleteUser);
+  .get(getUserValidator, getSingleUser)
+  .put(uploadUserImage, resizeImage, updateUserValidator, updateUser)
+  .delete(deleteUserValidator, deleteUser);
 
 module.exports = router;

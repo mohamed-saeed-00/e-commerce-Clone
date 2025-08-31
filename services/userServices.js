@@ -1,11 +1,14 @@
 const asyncHandler = require("express-async-handler");
 // eslint-disable-next-line import/no-extraneous-dependencies
 
+const bcrypt = require("bcryptjs");
+
+const { v4: uuidv4 } = require("uuid");
 // eslint-disable-next-line import/no-extraneous-dependencies
 const sharp = require("sharp");
 
+const AppError = require("../utils/appError");
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { v4: uuidv4 } = require("uuid");
 
 const User = require("../models/usersModal");
 
@@ -18,7 +21,7 @@ const {
 } = require("./handlerFactor");
 const { uploadSingleImage } = require("../middleware/uploadImageMiddleware");
 
-exports.uploadCategoryImage = uploadSingleImage("profileImg");
+exports.uploadUserImage = uploadSingleImage("profileImg");
 
 exports.resizeImage = asyncHandler(async (req, res, next) => {
   if (req.file) {
@@ -53,7 +56,46 @@ exports.getSingleUser = singleItemFactory(User);
 // @desc update a user by id
 // @route put
 // @access private
-exports.updateUser = updateOne(User);
+exports.updateUser = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const document = await User.findOneAndUpdate(
+    { _id: id },
+    {
+      name: req.body.name,
+      slug: req.body.slug,
+      email: req.body.email,
+      phone: req.body.phone,
+      profileImg: req.body.profileImg,
+    },
+    {
+      new: true,
+    }
+  );
+  if (!document) {
+    return next(new AppError(`no product for this id ${id}`, 404));
+  }
+  res.status(200).json({ data: document });
+});
+
+// @desc update a user password by id
+// @route put
+// @access private
+exports.updateUserPassword = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const document = await User.findOneAndUpdate(
+    { _id: id },
+    {
+      password: await bcrypt.hash(req.body.password, 12),
+    },
+    {
+      new: true,
+    }
+  );
+  if (!document) {
+    return next(new AppError(`no product for this id ${id}`, 404));
+  }
+  res.status(200).json({ data: document });
+});
 
 // @desc delete a SubCategory by id
 // @route put

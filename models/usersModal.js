@@ -1,9 +1,12 @@
 const mongoose = require("mongoose");
+// eslint-disable-next-line import/no-extraneous-dependencies
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
+      trim: true,
       require: [true, "name is require"],
     },
     slug: {
@@ -14,6 +17,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       require: [true, "email is require"],
       unique: [true, "email must be unique"],
+      lowercase: true,
     },
     phone: {
       type: String,
@@ -31,10 +35,20 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "user"],
       default: "user",
     },
+    active: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+userSchema.pre("save", async function (next) {
+  // hashing password before save the document
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
 
 module.exports = mongoose.model("user", userSchema);
