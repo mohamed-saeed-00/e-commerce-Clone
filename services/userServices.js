@@ -15,7 +15,6 @@ const User = require("../models/usersModal");
 const {
   deleteOne,
   createFctory,
-  updateOne,
   getAllFactory,
   singleItemFactory,
 } = require("./handlerFactor");
