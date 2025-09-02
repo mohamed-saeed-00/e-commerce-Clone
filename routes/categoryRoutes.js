@@ -19,13 +19,14 @@ const {
 
 const subCategoryRoutes = require("./subCategoryRoutes");
 
+const {protect}=require("../services/authServices")
 // nested route
 router.use("/:categoryId/subcategories", subCategoryRoutes);
 
 router
   .route("/")
   .get(getCategories)
-  .post(uploadCategoryImage, resizeImage, createCategoryRules, createCategory);
+  .post(protect,uploadCategoryImage, resizeImage, createCategoryRules, createCategory);
 
 router
   .route("/:id")

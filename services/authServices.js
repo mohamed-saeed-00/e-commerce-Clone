@@ -30,10 +30,10 @@ exports.signup = asyncHandler(async (req, res, next) => {
   res.json({ data: user, token });
 });
 
-// @desc sign in
+// @desc login
 // @route post
 // @access public
-exports.signin = asyncHandler(async (req, res, next) => {
+exports.login = asyncHandler(async (req, res, next) => {
   // #1 find if user exist
   const user = await User.findOne({ email: req.body.email });
 
@@ -47,4 +47,47 @@ exports.signin = asyncHandler(async (req, res, next) => {
   });
 
   res.json({ data: user.id, token });
+});
+
+// @desc check if user is login or no
+
+exports.protect = asyncHandler(async (req, res, next) => {
+  // 1) check if there is token or no
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  if (!token) {
+    return next(new AppError("there is no token please login", 401));
+  }
+
+  // 2)verify token (no change or expired)
+  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+  // 3) check if user exist
+  const currentUser = await User.findById(decoded.user_id);
+  if (!currentUser) {
+    return next(new AppError("user not exist", 401));
+  }
+
+  // 4) check if user change his password after login
+  if (currentUser.passwordChangedAt) {
+    const currentUserChanedPassTime = parseInt(
+      currentUser.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    if (currentUserChanedPassTime > decoded.iat) {
+      return next(
+        new AppError(
+          "User recently changed his password,please login again",
+          401
+        )
+      );
+    }
+  }
+  req.user = currentUser;
+  next();
 });

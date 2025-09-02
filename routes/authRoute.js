@@ -2,15 +2,15 @@ const express = require("express");
 
 const router = express.Router({ mergeParams: true });
 
-const { signup, signin } = require("../services/authServices");
+const { signup, login } = require("../services/authServices");
 
 const {
   signupValidator,
-  signinValidator,
+  loginValidator,
 } = require("../utils/validators/authValidator");
 
 router.route("/signup").post(signupValidator, signup);
-router.route("/signin").post(signinValidator, signin);
+router.route("/signin").post(loginValidator, login);
 
 // router
 //   .route("/:id")
