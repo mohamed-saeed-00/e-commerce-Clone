@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router({ mergeParams: true });
 
-const { signup, login } = require("../services/authServices");
+const { signup, login, forgotPassword } = require("../services/authServices");
 
 const {
   signupValidator,
@@ -11,13 +11,6 @@ const {
 
 router.route("/signup").post(signupValidator, signup);
 router.route("/signin").post(loginValidator, login);
-
-// router
-//   .route("/:id")
-//   .get(getUserValidator, getSingleUser)
-//   .put(uploadUserImage, resizeImage, updateUserValidator, updateUser)
-//   .delete(deleteUserValidator, deleteUser);
-
-// router.route("/changePassword/:id").put(updateUserPasswordValidator, updateUserPassword);
+router.post("/forgotPassword", forgotPassword);
 
 module.exports = router;

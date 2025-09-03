@@ -2,6 +2,9 @@ const asyncHandler = require("express-async-handler");
 // eslint-disable-next-line import/no-extraneous-dependencies
 
 // eslint-disable-next-line import/no-extraneous-dependencies
+const crypto = require("crypto");
+
+// eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require("jsonwebtoken");
 
 const bcrypt = require("bcryptjs");
@@ -10,6 +13,7 @@ const AppError = require("../utils/appError");
 // eslint-disable-next-line import/no-extraneous-dependencies
 
 const User = require("../models/usersModal");
+const handelMail = require("../utils/handelMails");
 
 // @desc sign up
 // @route post
@@ -94,7 +98,8 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
 // give permission to routes
 
-exports.allowedTo = (...userRole) => asyncHandler(async (req, res, next) => {
+exports.allowedTo = (...userRole) =>
+  asyncHandler(async (req, res, next) => {
     if (!userRole.includes(req.user.role)) {
       return next(
         new AppError(
@@ -105,3 +110,58 @@ exports.allowedTo = (...userRole) => asyncHandler(async (req, res, next) => {
     }
     next();
   });
+
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+  // 1) check if user exist
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new AppError("This user is not exsit", 404));
+  }
+
+  // generate random number from 6 digits
+  const resetRandomCode = Math.floor(
+    100000 + Math.random() * 900000
+  ).toString();
+
+  // hashing rest num by crypto
+  const hashingResetCode = crypto
+    .createHash("sha256")
+    .update(resetRandomCode)
+    .digest("hex");
+
+  // save hashed code in db
+  user.passwordResetCode = hashingResetCode;
+  // save passeord expird time in db
+  user.passwordResetExpired = Date.now() + 10 * 60 * 1000;
+  user.passwordResetVerifyed = false;
+
+  user.save();
+
+  const message = `HI ${user.name},
+Please use this code to reset the password for the ecommerce password ${user.email}
+Here is your code: ${resetRandomCode}
+Thanks.
+`;
+
+  try {
+    await handelMail({
+      email: user.email,
+      subject: "please reset your password ",
+      message,
+    });
+  } catch (error) {
+    user.passwordResetCode = undefined;
+
+    user.passwordResetExpired = undefined;
+    user.passwordResetVerifyed = undefined;
+
+    await user.save();
+
+    return next(new AppError("there are error in sending email", 500));
+  }
+
+  res.status(200).json({
+    status: 200,
+    message: "password reset code has succesfully send to this email",
+  });
+});
