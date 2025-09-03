@@ -18,15 +18,36 @@ const {
   resizeImages,
 } = require("../services/productServices");
 
+const authServices = require("../services/authServices");
+
 router
   .route("/")
   .get(getProducts)
-  .post(uploadMixImages, resizeImages, createProductValidator, createProduct);
+  .post(
+    authServices.protect,
+    authServices.allowedTo("admin", "manager"),
+    uploadMixImages,
+    resizeImages,
+    createProductValidator,
+    createProduct
+  );
 
 router
   .route("/:id")
   .get(getProductValidator, getProduct)
-  .put(uploadMixImages, resizeImages, updateProductValidator, updateProduct)
-  .delete(deleteProductValidator, deleteProduct);
+  .put(
+    authServices.protect,
+    authServices.allowedTo("admin", "manager"),
+    uploadMixImages,
+    resizeImages,
+    updateProductValidator,
+    updateProduct
+  )
+  .delete(
+    authServices.protect,
+    authServices.allowedTo("admin"),
+    deleteProductValidator,
+    deleteProduct
+  );
 
 module.exports = router;

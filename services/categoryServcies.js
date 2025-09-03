@@ -8,34 +8,24 @@ const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
 const factory = require("./handlerFactor");
 
-const {
-  uploadSingleImage,
-} = require("../middleware/uploadImageMiddleware");
+const { uploadSingleImage } = require("../middleware/uploadImageMiddleware");
 
 const categoryModel = require("../models/categoryModel");
-// const multerStorage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "uploads/categories");
-//   },
-//   filename: function (req, file, cb) {
-//     const ext = file.mimetype.split("/")[1];
-//     const fileName = `category-${uuidv4()}-${Date.now()}-.${ext}`;
-//     cb(null, fileName);
-//   },
-// });
 
 exports.uploadCategoryImage = uploadSingleImage("image");
 
 exports.resizeImage = asyncHandler(async (req, res, next) => {
-  const fileName = `category-${uuidv4()}-${Date.now()}-.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(600, 600)
-    .toFormat("jpeg")
-    .jpeg({ quality: 95 })
-    .toFile(`uploads/categories/${fileName}`);
+  if (req.file) {
+    const fileName = `category-${uuidv4()}-${Date.now()}-.jpeg`;
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat("jpeg")
+      .jpeg({ quality: 95 })
+      .toFile(`uploads/categories/${fileName}`);
 
-  // save image at database
-  req.body.image = fileName;
+    // save image at database
+    req.body.image = fileName;
+  }
   next();
 });
 

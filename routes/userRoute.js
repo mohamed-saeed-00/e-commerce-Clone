@@ -13,6 +13,8 @@ const {
   updateUserPassword,
 } = require("../services/userServices");
 
+const authServices = require("../services/authServices");
+
 const {
   getUserValidator,
   createUserValidator,
@@ -23,15 +25,40 @@ const {
 
 router
   .route("/")
-  .post(uploadUserImage, resizeImage, createUserValidator, createUser)
-  .get(getAllUsers);
+  .post(
+    authServices.protect,
+    authServices.allowedTo("admin", "manager"),
+    uploadUserImage,
+    resizeImage,
+    createUserValidator,
+    createUser
+  )
+  .get(
+    authServices.protect,
+    authServices.allowedTo("admin", "manager"),
+    getAllUsers
+  );
 
 router
   .route("/:id")
   .get(getUserValidator, getSingleUser)
-  .put(uploadUserImage, resizeImage, updateUserValidator, updateUser)
-  .delete(deleteUserValidator, deleteUser);
+  .put(
+    authServices.protect,
+    authServices.allowedTo("admin"),
+    uploadUserImage,
+    resizeImage,
+    updateUserValidator,
+    updateUser
+  )
+  .delete(
+    authServices.protect,
+    authServices.allowedTo("admin"),
+    deleteUserValidator,
+    deleteUser
+  );
 
-router.route("/changePassword/:id").put(updateUserPasswordValidator, updateUserPassword);
+router
+  .route("/changePassword/:id")
+  .put(updateUserPasswordValidator, updateUserPassword);
 
 module.exports = router;

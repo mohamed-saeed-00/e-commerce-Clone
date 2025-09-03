@@ -8,6 +8,8 @@ const {
   deleteBrandValidator,
 } = require("../utils/validators/brandValidator");
 
+const authServices = require("../services/authServices");
+
 const {
   getBrands,
   createBrand,
@@ -21,11 +23,30 @@ const {
 router
   .route("/")
   .get(getBrands)
-  .post(uploadBrandImage, resizeImage, createBrandValidator, createBrand);
+  .post(
+    authServices.protect,
+    authServices.allowedTo("admin", "manager"),
+    uploadBrandImage,
+    resizeImage,
+    createBrandValidator,
+    createBrand
+  );
 router
   .route("/:id")
   .get(getBrandValidator, getSingelBrand)
-  .put(uploadBrandImage, resizeImage, updateBrandValidator, updateBrand)
-  .delete(deleteBrandValidator, deleteBrand);
+  .put(
+    authServices.protect,
+    authServices.allowedTo("admin", "manager"),
+    uploadBrandImage,
+    resizeImage,
+    updateBrandValidator,
+    updateBrand
+  )
+  .delete(
+    authServices.protect,
+    authServices.allowedTo("admin"),
+    deleteBrandValidator,
+    deleteBrand
+  );
 
 module.exports = router;

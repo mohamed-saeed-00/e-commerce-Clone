@@ -19,19 +19,19 @@ const {
 
 const subCategoryRoutes = require("./subCategoryRoutes");
 
-const {protect}=require("../services/authServices")
+const authServices =require("../services/authServices")
 // nested route
 router.use("/:categoryId/subcategories", subCategoryRoutes);
 
 router
   .route("/")
   .get(getCategories)
-  .post(protect,uploadCategoryImage, resizeImage, createCategoryRules, createCategory);
+  .post(authServices.protect,authServices.allowedTo("admin","manager"),uploadCategoryImage, resizeImage, createCategoryRules, createCategory);
 
 router
   .route("/:id")
   .get(getCategoryRules, getCategory)
-  .put(uploadCategoryImage, resizeImage,updateCategoryRules, updateCategory)
-  .delete(deleteCategoryRules, deleteCategory);
+  .put(authServices.protect,authServices.allowedTo("admin","manager"),uploadCategoryImage, resizeImage,updateCategoryRules, updateCategory)
+  .delete(authServices.protect,authServices.allowedTo("admin"),deleteCategoryRules, deleteCategory);
 
 module.exports = router;

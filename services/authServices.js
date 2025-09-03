@@ -91,3 +91,17 @@ exports.protect = asyncHandler(async (req, res, next) => {
   req.user = currentUser;
   next();
 });
+
+// give permission to routes
+
+exports.allowedTo = (...userRole) => asyncHandler(async (req, res, next) => {
+    if (!userRole.includes(req.user.role)) {
+      return next(
+        new AppError(
+          "you are not allowed to access this route, please login agian..",
+          403
+        )
+      );
+    }
+    next();
+  });
