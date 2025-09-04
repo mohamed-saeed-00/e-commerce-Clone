@@ -40,18 +40,15 @@ exports.createFctory = (Model) =>
 exports.singleItemFactory = (Model) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const document = await Model.findById(id).populate({
-      path: "category",
-      select: "name -_id",
-    });
+    const document = await Model.findById(id);
     if (!document) {
-      return next(new AppError(`no product for this id ${id}`, 404));
+      return next(new AppError(`No document for this id ${id}`, 404));
     }
     res.status(200).json({ data: document });
   });
 
 // get all factory
-exports.getAllFactory = (Model,modelName = "") =>
+exports.getAllFactory = (Model, modelName = "") =>
   asyncHandler(async (req, res) => {
     let filter = {};
     if (req.filterObj) {

@@ -20,6 +20,9 @@ const {
 } = require("./handlerFactor");
 const { uploadSingleImage } = require("../middleware/uploadImageMiddleware");
 
+const { createToken } = require("../utils/createToken");
+const { findByIdAndUpdate } = require("../models/categoryModel");
+
 exports.uploadUserImage = uploadSingleImage("profileImg");
 
 exports.resizeImage = asyncHandler(async (req, res, next) => {
@@ -49,7 +52,7 @@ exports.getAllUsers = getAllFactory(User);
 
 // @desc get a specific user by id
 // @route get
-// @access public
+// @access private
 exports.getSingleUser = singleItemFactory(User);
 
 // @desc update a user by id
@@ -102,3 +105,64 @@ exports.updateUserPassword = asyncHandler(async (req, res, next) => {
 // @access private
 
 exports.deleteUser = deleteOne(User);
+
+// @desc get a specific user by id
+// @route get
+// @access private
+exports.getloggedUserData = asyncHandler(async (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+});
+
+exports.updateloggedUserpassword = asyncHandler(async (req, res, next) => {
+  // 1) get user by id and update it
+  const user = await User.findByIdAndUpdate(
+    { _id: req.user._id },
+    {
+      password: await bcrypt.hash(req.body.password, 12),
+      passwordChangedAt: Date.now(),
+    },
+    { new: true }
+  );
+
+  const token = createToken(user._id);
+
+  res.status(200).json({ token });
+});
+exports.updateloggedUserData = asyncHandler(async (req, res, next) => {
+  // 1) get user by id and update it
+  const user = await User.findByIdAndUpdate(
+    { _id: req.user._id },
+    {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+    },
+    { new: true }
+  );
+
+  res.status(200).json({ user });
+});
+
+exports.deleteMe = asyncHandler(async (req, res, next) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      active: false,
+    },
+    { new: true }
+  );
+
+  res.status(200).json({ message: "user succcesfully inactive" });
+});
+exports.activeMe = asyncHandler(async (req, res, next) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      active: true,
+    },
+    { new: true }
+  );
+
+  res.status(200).json({ message: "user succcesfully active" });
+});

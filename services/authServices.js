@@ -15,6 +15,7 @@ const AppError = require("../utils/appError");
 const User = require("../models/usersModal");
 const handelMail = require("../utils/handelMails");
 
+const { createToken } = require("../utils/createToken");
 // @desc sign up
 // @route post
 // @access public
@@ -26,11 +27,9 @@ exports.signup = asyncHandler(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
   });
-
+  const token = createToken(user._id);
   // #2 create jwt
-  const token = jwt.sign({ user_id: user.id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
+
   res.json({ data: user, token });
 });
 
@@ -46,9 +45,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 
   // #2 if user exist create jwt
-  const token = jwt.sign({ user_id: user.id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
+  const token = createToken(user._id);
 
   res.json({ data: user.id, token });
 });
@@ -56,6 +53,50 @@ exports.login = asyncHandler(async (req, res, next) => {
 // @desc check if user is login or no
 
 exports.protect = asyncHandler(async (req, res, next) => {
+  // 1) check if there is token or no
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  if (!token) {
+    return next(new AppError("there is no token please login", 401));
+  }
+
+  // 2)verify token (no change or expired)
+  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+  // 3) check if user exist
+  const currentUser = await User.findById(decoded.user_id);
+  if (!currentUser) {
+    return next(new AppError("user not exist", 401));
+  }
+
+  if(!currentUser.active){
+     return next(new AppError("user inactive now please active it and try agine", 401));
+  }
+
+  // 4) check if user change his password after login
+  if (currentUser.passwordChangedAt) {
+    const currentUserChanedPassTime = parseInt(
+      currentUser.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    if (currentUserChanedPassTime > decoded.iat) {
+      return next(
+        new AppError(
+          "User recently changed his password,please login again",
+          401
+        )
+      );
+    }
+  }
+  req.user = currentUser;
+  next();
+});
+exports.protectForActive = asyncHandler(async (req, res, next) => {
   // 1) check if there is token or no
   let token;
   if (
@@ -111,6 +152,10 @@ exports.allowedTo = (...userRole) =>
     next();
   });
 
+// @desc forgot the password and reset it
+// @route post
+// @access public
+
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
   // 1) check if user exist
   const user = await User.findOne({ email: req.body.email });
@@ -153,7 +198,7 @@ Thanks.
     user.passwordResetCode = undefined;
 
     user.passwordResetExpired = undefined;
-    user.passwordResetVerifyed = undefined;
+    user.passwordResetVerifyed = false;
 
     await user.save();
 
@@ -164,4 +209,55 @@ Thanks.
     status: 200,
     message: "password reset code has succesfully send to this email",
   });
+});
+
+// @desc verify reset code
+// @route post
+// @access public
+
+exports.verifyResetPassCode = asyncHandler(async (req, res, next) => {
+  // 1) get user by reset code
+  const hashingResetCode = crypto
+    .createHash("sha256")
+    .update(req.body.resetCode)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetCode: hashingResetCode,
+    passwordResetExpired: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new AppError("reset code is invalid"));
+  }
+  user.passwordResetVerifyed = true;
+  user.save();
+
+  res.status(200).json({ status: "success" });
+});
+
+// @desc update with new password
+// @route post
+// @access public
+
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+  // find user based on email
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new AppError("this email is incorrect"));
+  }
+
+  user.password = req.body.newPassword;
+
+  user.passwordResetCode = undefined;
+
+  user.passwordResetExpired = undefined;
+  user.passwordResetVerifyed = false;
+
+  user.save();
+
+  const token = createToken(user._id);
+
+  res.status(200).json({ token });
 });

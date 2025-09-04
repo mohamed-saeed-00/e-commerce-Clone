@@ -20,7 +20,7 @@ const subCategoryRoutes = require("./routes/subCategoryRoutes");
 const brandRouter = require("./routes/brandsRoute");
 const productRouter = require("./routes/productRoutes");
 const userRouter = require("./routes/userRoute");
-const authRouter = require("./routes/authRoute")
+const authRouter = require("./routes/authRoute");
 // mounting api
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "uploads")));
