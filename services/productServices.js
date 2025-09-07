@@ -11,9 +11,7 @@ const { v4: uuidv4 } = require("uuid");
 const AppError = require("../utils/appError");
 const Product = require("../models/productModal");
 const factory = require("./handlerFactor");
-const {uploadMixImages} =require("../middleware/uploadImageMiddleware")
-
-
+const { uploadMixImages } = require("../middleware/uploadImageMiddleware");
 
 exports.uploadMixImages = uploadMixImages([
   { name: "imageCover", maxCount: 1 },
@@ -60,7 +58,7 @@ exports.getProducts = factory.getAllFactory(Product, "Products");
 // @desc get a specific product by id
 // @route get
 // @access public
-exports.getProduct = factory.singleItemFactory(Product);
+exports.getProduct = factory.singleItemFactory(Product, "reviews");
 
 // @desc create a product
 // @route post

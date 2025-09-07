@@ -22,7 +22,11 @@ exports.createReviewValidator = [
     .withMessage("rating is required")
     .isFloat({ min: 1, max: 5 })
     .withMessage("rating must be between 1 and 5"),
-  check("user").isMongoId().withMessage("Invalid User Review id format"),
+
+  // comment this to make user id diynamic and auto put by user._id
+
+  // check("user").isMongoId().withMessage("Invalid User Review id format"),
+
   check("product")
     .isMongoId()
     .withMessage("Invalid Product Review id format")
@@ -41,11 +45,42 @@ exports.createReviewValidator = [
 ];
 
 exports.updateReviewValidator = [
-  check("id").isMongoId().withMessage("Invalid Review id format"),
+  check("id")
+    .isMongoId()
+    .withMessage("Invalid Review id format")
+    .custom((val, { req }) =>
+      Review.findById(val).then((review) => {
+        if (!review) {
+          return Promise.reject(new Error("there is not review for this id"));
+        }
+        if (review.user._id.toString() !== req.user._id.toString()) {
+          return Promise.reject(
+            new Error("you are not allowed to perform this action")
+          );
+        }
+      })
+    ),
   validatorMiddleware,
 ];
 
 exports.deleteReviewValidator = [
-  check("id").isMongoId().withMessage("Invalid Review id format"),
+  check("id")
+    .isMongoId()
+    .withMessage("Invalid Review id format")
+    .custom((val, { req }) =>
+      Review.findById(val).then((review) => {
+        if (req.user.role === "user") {
+          if (!review) {
+            return Promise.reject(new Error("there is not review for this id"));
+          }
+          if (review.user._id.toString() !== req.user._id.toString()) {
+            return Promise.reject(
+              new Error("you are not allowed to perform this action")
+            );
+          }
+        }
+        return true;
+      })
+    ),
   validatorMiddleware,
 ];

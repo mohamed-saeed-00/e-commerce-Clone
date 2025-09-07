@@ -1,3 +1,4 @@
+const asyncHandler = require("express-async-handler");
 
 const Review = require("../models/reviewModal");
 
@@ -7,7 +8,16 @@ const factory = require("./handlerFactor");
 // @route post
 // @access protect,[user]
 
-exports.createReview = factory.createFctory(Review);
+exports.createReview = asyncHandler(async (req, res, next) => {
+  const document = await Review.create({
+    title: req.body.title,
+    rating: req.body.rating,
+    user: req.user._id,
+    product: req.body.product,
+  });
+
+   res.status(201).json({ data: document });
+});
 
 // @desc get list of Review
 // @route get

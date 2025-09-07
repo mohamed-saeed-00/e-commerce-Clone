@@ -37,10 +37,16 @@ exports.createFctory = (Model) =>
 
 // get sigle item factory
 
-exports.singleItemFactory = (Model) =>
+exports.singleItemFactory = (Model, populationOpt) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const document = await Model.findById(id);
+    let query = Model.findById(id);
+
+    if (populationOpt) {
+      query = query.populate(populationOpt);
+    }
+    const document = await query;
+
     if (!document) {
       return next(new AppError(`No document for this id ${id}`, 404));
     }
