@@ -10,7 +10,7 @@ const sharp = require("sharp");
 const AppError = require("../utils/appError");
 // eslint-disable-next-line import/no-extraneous-dependencies
 
-const User = require("../models/usersModal");
+const User = require("../models/usersModel");
 
 const {
   deleteOne,

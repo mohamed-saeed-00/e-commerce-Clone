@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 const sharp = require("sharp");
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { v4: uuidv4 } = require("uuid");
-const Brand = require("../models/brandsModal");
+const Brand = require("../models/brandsModel");
 
 const factory = require("./handlerFactor");
 const {

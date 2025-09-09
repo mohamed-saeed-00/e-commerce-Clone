@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 
-const User = require("../models/usersModal");
+const User = require("../models/usersModel");
 // @desc add product to wishlist
 // @route post
 // @access protect,[user]

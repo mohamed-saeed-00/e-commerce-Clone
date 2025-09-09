@@ -1,4 +1,4 @@
-const SubCategory = require("../models/subCategoryModal");
+const SubCategory = require("../models/subCategoryModel");
 
 const factory = require("./handlerFactor");
 

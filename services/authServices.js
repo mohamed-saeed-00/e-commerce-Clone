@@ -12,7 +12,7 @@ const bcrypt = require("bcryptjs");
 const AppError = require("../utils/appError");
 // eslint-disable-next-line import/no-extraneous-dependencies
 
-const User = require("../models/usersModal");
+const User = require("../models/usersModel");
 const handelMail = require("../utils/handelMails");
 
 const { createToken } = require("../utils/createToken");
@@ -74,8 +74,10 @@ exports.protect = asyncHandler(async (req, res, next) => {
     return next(new AppError("user not exist", 401));
   }
 
-  if(!currentUser.active){
-     return next(new AppError("user inactive now please active it and try agine", 401));
+  if (!currentUser.active) {
+    return next(
+      new AppError("user inactive now please active it and try agine", 401)
+    );
   }
 
   // 4) check if user change his password after login

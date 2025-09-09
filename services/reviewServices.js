@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 
-const Review = require("../models/reviewModal");
+const Review = require("../models/reviewModel");
 
 const factory = require("./handlerFactor");
 

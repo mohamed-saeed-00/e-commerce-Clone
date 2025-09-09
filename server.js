@@ -23,6 +23,7 @@ const userRouter = require("./routes/userRoute");
 const authRouter = require("./routes/authRoute");
 const reviewRouter = require("./routes/reviewRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
+const addressesRoutes = require("./routes/addressesRoutes");
 // mounting api
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "uploads")));
@@ -34,6 +35,7 @@ app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/addresses", addressesRoutes);
 
 app.all("*", (req, res, next) => {
   next(

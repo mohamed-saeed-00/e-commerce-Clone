@@ -2,7 +2,7 @@ const slugify = require("slugify");
 
 const { check } = require("express-validator");
 
-const User = require("../../models/usersModal");
+const User = require("../../models/usersModel");
 
 const validatorMiddleware = require("../../middleware/validatorMiddleware");
 

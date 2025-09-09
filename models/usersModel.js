@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       trim: true,
-      require: [true, "name is require"],
+      required: [true, "name is required"],
     },
     slug: {
       type: String,
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      require: [true, "email is require"],
+      required: [true, "email is require"],
       unique: [true, "email must be unique"],
       lowercase: true,
     },
@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      require: [true, "password is required"],
+      required: [true, "password is required"],
       minlength: [8, "Password must be at least 8 characters"],
     },
     passwordChangedAt: { type: Date },
@@ -50,6 +50,15 @@ const userSchema = new mongoose.Schema(
         ref: "product",
       },
     ],
+
+    addresses:[{
+      _id:{type:mongoose.Schema.Types.ObjectId,auto:true},
+      alias:String,
+      details:String,
+      city:String,
+      phone:String,
+      postalCode:String
+    }],
   },
   {
     timestamps: true,

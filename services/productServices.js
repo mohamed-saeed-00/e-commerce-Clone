@@ -9,7 +9,7 @@ const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
 
 const AppError = require("../utils/appError");
-const Product = require("../models/productModal");
+const Product = require("../models/productModel");
 const factory = require("./handlerFactor");
 const { uploadMixImages } = require("../middleware/uploadImageMiddleware");
 
