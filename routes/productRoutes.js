@@ -18,7 +18,13 @@ const {
   resizeImages,
 } = require("../services/productServices");
 
+const reviewsRoute = require("./reviewRoutes");
+
 const authServices = require("../services/authServices");
+
+// nested route
+
+router.use("/:productId/reviews", reviewsRoute);
 
 router
   .route("/")

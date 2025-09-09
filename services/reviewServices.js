@@ -8,6 +8,11 @@ const factory = require("./handlerFactor");
 // @route post
 // @access protect,[user]
 
+exports.setProductIdToBody = (req, res, next) => {
+  if (!req.body.product) req.body.product = req.params.productId;
+  next();
+};
+
 exports.createReview = asyncHandler(async (req, res, next) => {
   const document = await Review.create({
     title: req.body.title,
@@ -16,12 +21,19 @@ exports.createReview = asyncHandler(async (req, res, next) => {
     product: req.body.product,
   });
 
-   res.status(201).json({ data: document });
+  res.status(201).json({ data: document });
 });
 
 // @desc get list of Review
 // @route get
 // @access public
+
+exports.createFilterObj = (req, res, next) => {
+  let filterObject = {};
+  if (req.params.productId) filterObject = { product: req.params.productId };
+  req.filterObj = filterObject;
+  next();
+};
 
 exports.getReviews = factory.getAllFactory(Review);
 

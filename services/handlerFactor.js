@@ -6,11 +6,13 @@ const ApiFeatures = require("../utils/apiFeatures");
 exports.deleteOne = (Model) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
-    const documents = await Model.findByIdAndDelete({ _id: id });
-    if (!documents) {
+    const document = await Model.findByIdAndDelete({ _id: id });
+    if (!document) {
       return next(new AppError(`no product for this id ${id}`, 404));
     }
-    res.status(200).json({ data: documents });
+
+    document.deleteOne();
+    res.status(200).json({ data: document });
   });
 
 // update factory
@@ -24,6 +26,8 @@ exports.updateOne = (Model) =>
     if (!document) {
       return next(new AppError(`no product for this id ${id}`, 404));
     }
+
+    document.save();
     res.status(200).json({ data: document });
   });
 

@@ -13,6 +13,7 @@ exports.setCategoryIdToBody = (req, res, next) => {
 
 exports.createSubCategory = factory.createFctory(SubCategory);
 
+
 exports.createFilterObj = (req, res, next) => {
   let filterObject = {};
   if (req.params.categoryId) filterObject = { category: req.params.categoryId };
