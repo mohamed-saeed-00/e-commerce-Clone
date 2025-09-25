@@ -4,6 +4,12 @@ const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+const cors = require("cors");
+
+// eslint-disable-next-line import/no-extraneous-dependencies
+const compression = require("compression");
+
 const app = express();
 const port = process.env.PORT || 8000;
 const AppError = require("./utils/appError");
@@ -15,27 +21,15 @@ dbConnection();
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-const categoryRoutes = require("./routes/categoryRoutes");
-const subCategoryRoutes = require("./routes/subCategoryRoutes");
-const brandRouter = require("./routes/brandsRoute");
-const productRouter = require("./routes/productRoutes");
-const userRouter = require("./routes/userRoute");
-const authRouter = require("./routes/authRoute");
-const reviewRouter = require("./routes/reviewRoutes");
-const wishlistRoutes = require("./routes/wishlistRoutes");
-const addressesRoutes = require("./routes/addressesRoutes");
+const { mountsRoutes } = require("./routes");
 // mounting api
 app.use(express.json());
+app.use(cors());
+app.options("*", cors()); // include before other routes
+app.use(compression());
 app.use(express.static(path.join(__dirname, "uploads")));
-app.use("/api/categories", categoryRoutes);
-app.use("/api/subcategories", subCategoryRoutes);
-app.use("/api/brands", brandRouter);
-app.use("/api/products", productRouter);
-app.use("/api/users", userRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/reviews", reviewRouter);
-app.use("/api/wishlist", wishlistRoutes);
-app.use("/api/addresses", addressesRoutes);
+
+mountsRoutes(app);
 
 app.all("*", (req, res, next) => {
   next(

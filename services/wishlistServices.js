@@ -32,7 +32,7 @@ exports.removeProductFromWishlist = asyncHandler(async (req, res, next) => {
     { new: true }
   );
 
-  res.status(201).json({
+  res.status(200).json({
     message: "product deleted from wishlist successfuly",
     data: user.wishlist,
   });

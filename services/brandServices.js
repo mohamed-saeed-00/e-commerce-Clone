@@ -25,7 +25,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
   next();
 });
 
-// @desc create a category
+// @desc create a Brand
 // @route post
 // @access private
 
@@ -37,19 +37,19 @@ exports.createBrand = factory.createFctory(Brand);
 
 exports.getBrands = factory.getAllFactory(Brand);
 
-// @desc get a specific category by id
+// @desc get a specific Brand by id
 // @route get
 // @access public
 
 exports.getSingelBrand = factory.singleItemFactory(Brand);
 
-// @desc update a category by id
+// @desc update a Brand by id
 // @route put
 // @access private
 
 exports.updateBrand = factory.updateOne(Brand);
 
-// @desc delete a category by id
+// @desc delete a Brand by id
 // @route put
 // @access private
 
